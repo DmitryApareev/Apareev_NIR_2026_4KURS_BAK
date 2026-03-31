@@ -29,3 +29,14 @@
 ```bash
 git clone https://github.com/DmitryApareev/Apareev_NIR_2026_4KURS_BAK
 cd Apareev_NIR_2026_4KURS_BAK
+```
+
+2. Установить зависимости:
+```bash
+pip install -r requirements.txt
+```
+
+3. Запуск
+```bash
+python main.py
+```
