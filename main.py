@@ -6,6 +6,7 @@ from src.evaluate import evaluate
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_curve
+from sklearn.utils import resample
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
@@ -27,6 +28,28 @@ X_train, X_test, y_train, y_test = train_test_split(
     random_state=42,
     stratify=y
 )
+
+# 3.1 Бутстреп применяем только к train-части (без утечки в test)
+train_df = pd.concat([X_train, y_train], axis=1)
+minority_class = y_train.value_counts().idxmin()
+
+minority_df = train_df[train_df["target"] == minority_class]
+majority_df = train_df[train_df["target"] != minority_class]
+
+minority_df_bootstrapped = resample(
+    minority_df,
+    replace=True,
+    n_samples=len(majority_df),
+    random_state=42
+)
+
+train_balanced_df = pd.concat([majority_df, minority_df_bootstrapped]).sample(
+    frac=1,
+    random_state=42
+)
+
+y_train = train_balanced_df["target"]
+X_train = train_balanced_df.drop(columns=["target"])
 
 # 4. Препроцессор и модели
 preprocessor = build_preprocessor(X)
